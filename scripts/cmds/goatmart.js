@@ -1,245 +1,122 @@
 const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
-
-const GoatMart = "https://goatmart.vercel.app";
+const APIKEY = "V-GoatMart-Beta-xv4-Ibs8j-90-az7-V";
+const serverURL = "https://goatmart-v2.vercel.app";
 
 module.exports = {
   config: {
     name: "goatmart",
     aliases: ["gm"],
-    shortDescription: { en: "🌟 GoatMart - Your Command Marketplace" },
-    longDescription: { en: "✨ Browse, search, upload, and manage commands in the GoatMart marketplace." },
-    category: "utility",
-    version: "2.2",
     role: 0,
-    author: "Aryan Chauhan",
-    cooldowns: 0,
+    shortDescription: {
+      en: "View Items Available In The GoatMart."
+    },
+    category: "store",
+    author: "Rômeo | Aryan | ©GoatMart",
   },
-
   onStart: async ({ api, event, args, message }) => {
-    const a = (content) => {
-      const h = "╭───『 🐐 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁 』───╮\n";
-      const f = "\n╰─────────────╯";
-      return message.reply(h + content + f);
-    };
-
-    const b = (error, action) => {
-      console.error(`GoatMart ${action} error:`, error);
-
-      if (error.response?.status === 503) return a("\n🚧 Service under maintenance. Please try again later.");
-      if (error.response?.status === 404) return a(`\n❌ Not found: The requested resource doesn't exist.`);
-      if (error.response?.status === 500) return a(`\n⚠️ Server error: Please try again in a few moments.`);
-
-      if (["ECONNREFUSED", "ENOTFOUND"].includes(error.code)) {
-        return a(`\n🔌 Connection error: Cannot reach GoatMart server.\nPlease check: ${GoatMart}`);
-      }
-
-      if (error.response?.data?.maintenanceMode) {
-        return a(`\n🚧 ${error.response.data.title}\n💬 ${error.response.data.message}\n` +
-          (error.response.data.estimatedTime ? `⏰ Estimated: ${error.response.data.estimatedTime}` : ""));
-      }
-
-      return a(`\n❌ Error: Unable to ${action}.\nStatus: ${error.response?.status || "Unknown"}\nMessage: ${error.response?.data?.error || error.message || "Unknown error"}`);
-    };
-
     try {
       if (!args[0]) {
-        return a(
-          "\n📋 𝗔𝘃𝗮𝗶𝗹𝗮𝗯𝗹𝗲 𝗖𝗼𝗺𝗺𝗮𝗻𝗱𝘀:\n\n" +
-          `📦 ${event.body} show <ID>\n📄 ${event.body} page <number>\n🔍 ${event.body} search <query>\n📊 ${event.body} stats\n⬆️ ${event.body} upload <name>\n🔗 ${event.body} raw <ID>\n🎯 ${event.body} trending\n🔧 ${event.body} maintenance\n💡 Example: ${event.body} show 1`
-        );
-      }
+        api.sendMessage(`📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━━\n\n➜ ${event.body} 𝗉𝖺𝗀𝖾 <𝗽𝗮𝗴𝗲 𝗻𝘂𝗺𝗯𝗲𝗿>\n➜ ${event.body} 𝗌𝗁𝗈𝗐 <𝗜𝘁𝗲𝗺 𝗜𝗗>\n➜ ${event.body} 𝗎𝗉𝗅𝗈𝖺𝖽 < 𝗝𝘀𝗼𝗻 𝗙𝗼𝗿𝗺𝗮𝘁>\n➜ ${event.body} 𝖾𝖽𝗂𝗍 <𝗜𝘁𝗲𝗺 𝗜𝗗>\n➜ ${event.body} 𝗌𝖾𝖺𝗋𝖼𝗁 <𝗜𝘁𝗲𝗺 𝗡𝗮𝗺𝗲>\n➜ ${event.body} 𝖽𝖾𝗅𝖾𝗍𝖾 <𝗜𝘁𝗲𝗺 𝗜𝗗>\n\n📒 𝗡𝗼𝘁𝗲: 𝖨𝖿 𝗒𝗈𝗎 𝖽𝗈𝗇'𝗍 𝗄𝗇𝗈𝗐 𝗁𝗈𝗐 𝗍𝗈 𝗎𝗌𝖾 𝗎𝗉𝗅𝗈𝖺𝖽, 𝖾𝖽𝗂𝗍 𝖿𝖾𝖺𝗍𝗎𝗋𝖾𝗌 𝗒𝗈𝗎 𝖼𝖺𝗇 𝖺𝗌𝗄 𝖺𝖻𝗈𝗎𝗍 𝗍𝗁𝗂𝗌 𝗍𝗈𝗉𝗂𝖼 𝖿𝗋𝗈𝗆 𝗈𝗎𝗋 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁 𝖣𝖾𝗏𝖾𝗅𝗈𝗉𝖾𝗋𝗌.\n\n- 𝖳𝖾𝖺𝗆 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n𝖳𝗁𝖺𝗇𝗄 𝗒𝗈𝗎 𝖿𝗈𝗋 𝗎𝗌𝗂𝗇𝗀 𝗈𝗎𝗋 𝖦𝗈𝖺𝗍𝖬𝖺𝗋𝗍 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 🥰.`, event.threadID, event.messageID);
+      } else if (args[0] === "page") {
+        const pageNumber = parseInt(args[1]);
+        const response = await axios.get(`${serverURL}/api/items?apikey=${APIKEY}`);
+        const items = response.data;
 
-      const c = args[0].toLowerCase();
+        if (response.status === 200) {
+          const totalPages = Math.ceil(items.length / 6);
+          const offset = (pageNumber - 1) * 6;
 
-      switch (c) {
-        case "show": {
-          const d = parseInt(args[1]);
-          if (isNaN(d)) return a("\n⚠️ Please provide a valid item ID.");
-          try {
-            const e = await axios.get(`${GoatMart}/api/item/${d}`);
-            const f = e.data;
-            return a(`\n📦 Name: ${f.itemName}\n🆔 ID: ${f.itemID}\n⚙️ Type: ${f.type}\n📝 Desc: ${f.description}\n👨‍💻 Author: ${f.authorName}\n📅 Added: ${new Date(f.createdAt).toLocaleDateString()}\n👀 Views: ${f.views}\n💝 Likes: ${f.likes}\n📄 Raw: ${f.rawLink}\n🔗 View: ${GoatMart}/view?id=${f.itemID}`);
-          } catch (err) {
-            if (err.response?.status === 404) return a("\n❌ Command not found.");
-            return b(err, "fetch command");
+          if (pageNumber <= 0 || pageNumber > totalPages || isNaN(pageNumber)) {
+            api.sendMessage("📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━━\n𝖳𝗁𝖾 𝗌𝖾𝗋𝗏𝗂𝖼𝖾 𝘆𝗈𝘂 𝖺𝗋𝖾 𝗍𝗋𝗒𝗂𝗇𝗀 𝘁𝗈 𝖺𝖼𝖼𝖾𝗌𝗌 𝗂𝗌 𝖼𝗎𝗋𝗋𝖾𝗇𝗍𝗅𝗒 𝗇𝗈𝗍 𝖺𝗏𝖺𝗂𝗅𝖺𝖻𝗅𝖾 𝗂𝗇 𝗈𝗎𝗋 𝗪𝖾𝖻𝗌𝗂𝗍𝖾. 𝖸𝗈𝗎 𝖼𝖺𝗇 𝖺𝗅𝗌𝗈 𝖺𝗌𝗄 𝖿𝗋𝗈𝗆 𝗈𝗎𝗋 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁 𝖣𝖾𝗏𝖾𝗅𝗈𝗉𝖾𝗋𝗌 𝗍𝗈 𝗆𝖺𝗄𝖾 𝗒𝗈𝗎𝗋 𝗋𝖾𝗊𝗎𝖾𝗌𝗍 𝖺𝗌 𝗉𝗈𝗌𝗌𝗂𝖻𝗅𝖾. 𝖳𝗁𝖺𝗇𝗄 𝖸𝗈𝗎.\n\n- 𝖳𝖾𝖺𝗆 𝗚𝗈𝖺𝗍𝗠𝖺𝗋𝗍\n𝖳𝗁𝖺𝗇𝗄 𝘆𝗈𝗎 𝖿𝗈𝗋 𝗎𝗌𝗂𝗇𝗀 𝗈𝗎𝗋 𝖦𝗈𝖺𝗍𝗆𝖺𝗋𝗍 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 🥰.", event.threadID, event.messageID);
+          } else {
+            const pageItems = items.slice(offset, offset + 6);
+
+            const itemDescriptions = pageItems.map(
+              (item) =>
+                `👑 𝗜𝘁𝗲𝗺 𝗡𝗮𝗺𝗲: ${item.itemName}\n🆔 𝗜𝘁𝗲𝗺 𝗜𝗗: ${item.itemID}\n📝 𝗗𝗲𝘀𝗰𝗿𝗶𝗽𝘁𝗶𝗼𝗻: ${item.description}\n💻 𝗔𝘂𝘁𝗵𝗼𝗿: ${item.authorName}\n📅 𝗧𝗶𝗺𝗲: ${item.timestamp}\n\n━━━━━━━━━━━━\n`
+            );
+
+            const itemInfo = itemDescriptions.join("\n");
+
+            message.reply(`📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━━\n\n✅ 𝖧𝖾𝗋𝖾 𝖺𝗋𝖾 𝗌𝗈𝗆𝖾 𝗗𝗮𝘁𝗮 𝖼𝗎𝗋𝗋𝖾𝗇𝗍𝗅𝗒 𝖺𝗏𝖺𝗂𝗅𝖺𝖻𝗅𝖾 𝗂𝗇 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n\n${itemInfo}📝 𝗨𝘀𝗮𝗴𝗲𝘀:\n ${event.body.split(" ")[0]} [ show ] <item id> to view command data.\n\n👑 𝗣𝗮𝗴𝗲𝘀: [ ${pageNumber} / ${totalPages} ]\n\n- 𝖳𝖾𝖺𝗆 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n𝖳𝗁𝖺𝗇𝗄 𝗒𝗈𝗎 𝖿𝗈𝗋 𝗎𝗌𝗂𝗇𝗀 𝗈𝗎𝗋 𝖦𝗈𝖺𝗍𝖬𝖺𝗋𝗍 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 🥰.`);
           }
+        } else if (response.status === 401) {
+          api.sendMessage("📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━\n\n𝖳𝗁𝖾 𝗔𝗣𝗜 𝗞𝗘𝗬 𝗒𝗈𝗎 𝖺𝗋𝖾 𝗍𝗋𝗒𝗂𝗇𝗀 𝗍𝗈 𝖺𝖼𝖼𝖾𝗌𝗌 𝗈𝗎𝗋 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 𝗂𝗌 𝗇𝗈𝗍 𝖺𝖼𝗍𝗂𝗏𝖺𝗍𝖾𝖽 𝗂𝗋 𝗂𝗇𝗏𝖺𝗅𝗂𝖽 𝖺𝗉𝗂𝗄𝖾𝗒, 𝗉𝗅𝖾𝖺𝗌𝖾 𝖼𝗁𝖾𝖼𝗄 𝗒𝗈𝗎𝗋 𝗔𝗣𝗜 𝗞𝗘𝗬 𝗂𝗌 𝗐𝗈𝗋𝗄𝗂𝗇𝗀, 𝗂𝖿 𝗍𝗁𝗂𝗌 𝖺𝗉𝗂𝗄𝖾𝗒 𝗂𝗌 𝗇𝗈𝗍 𝗏𝖺𝗅𝗂𝖽 𝗒𝗈𝗎 𝖼𝖺𝗇 𝗃𝗈𝗂𝗇 𝗈𝗎𝗋 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁 𝖢𝗈𝗆𝗆𝗎𝗇𝗂𝗍𝗒 𝖿𝗈𝗋 𝗇𝖾𝗐 𝖺𝗉𝗂𝗄𝖾𝗒, 𝖻𝖾𝖼𝖺𝗎𝗌𝖾 𝗐𝗂𝗍𝗁𝗈𝗎𝗋 𝖺𝗎𝗍𝗁𝗈𝗋𝗂𝗌𝖾𝖽 𝗒𝗈𝗎 𝖼𝖺𝗇'𝗍 𝖺𝖼𝖼𝖾𝗌 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁 𝖲𝖾𝗋𝗏𝗂𝖼𝖾𝗌. 𝖳𝗁𝖺𝗇𝗄 𝖸𝗈𝗎\n\n- 𝖳𝖾𝖺𝗆 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n𝖳𝗁𝖺𝗇𝗄 𝗒𝗈𝗎 𝖿𝗈𝗋 𝗎𝗌𝗂𝗇𝗀 𝗈𝗎𝗋 𝖦𝗈𝖺𝗍𝖬𝖺𝗋𝗍 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 🥰.", event.threadID, event.messageID);
         }
+      } else if (args[0] === "search") {
+        const searchTerm = args.slice(1).join(" ").toLowerCase();
 
-        case "get": 
-        case "lookup": {
-          const id = args[1];
-          if (!id) return a("\n⚠️ Please provide a command ID (can be numeric or short ID).");
-          try {
-            const response = await axios.get(`${GoatMart}/api/lookup/${encodeURIComponent(id)}`);
-            const f = response.data;
-            return a(`\n📦 Name: ${f.itemName}\n🆔 ID: ${f.itemID} | 🔤 Short: ${f.shortId}\n📊 Sequential: ${f.sequentialId}\n⚙️ Type: ${f.type}\n📝 Desc: ${f.description}\n👨‍💻 Author: ${f.authorName}\n📅 Added: ${new Date(f.createdAt).toLocaleDateString()}\n👀 Views: ${f.views}\n💝 Likes: ${f.likes}\n📄 Raw: ${f.rawLink}\n🔗 View: ${GoatMart}/view?id=${f.itemID}`);
-          } catch (err) {
-            if (err.response?.status === 404) return a("\n❌ Command not found.");
-            return b(err, "lookup command");
-          }
+        const response = await axios.get(`${serverURL}/api/items?apikey=${APIKEY}`);
+
+        const items = response.data;
+        const matchingItems = items.filter(item => item.itemName.toLowerCase().includes(searchTerm) || item.description.toLowerCase().includes(searchTerm));
+
+        if (matchingItems.length > 0) {
+          const itemDescriptions = matchingItems.map(item => `\n👑 𝗜𝘁𝗲𝗺 𝗡𝗮𝗺𝗲: ${item.itemName}\n🆔 𝗜𝘁𝗲𝗺 𝗜𝗗: ${item.itemID}\n📝 𝗗𝗲𝘀𝗰𝗿𝗶𝗽𝘁𝗶𝗼𝗻: ${item.description}\n💻 𝗔𝘂𝘁𝗵𝗼𝗿: ${item.authorName}\n📅 𝗧𝗶𝗺𝗲: ${item.timestamp}\n━━━━━━━━━━━━\n`);
+          const itemInfo = itemDescriptions.join("\n");
+
+          message.reply(`📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━\n\n✅ 𝖧𝖾𝗋𝖾 𝗂𝗌 𝗒𝗈𝗎𝗋 𝗌𝖾𝖺𝗋𝖼𝗁𝖾𝖽 𝗋𝖾𝗌𝗎𝗅𝗍𝗌 𝖽𝖺𝗍𝖺 𝖿𝗈𝗋 𝗒𝗈𝗎𝗋 𝗊𝗎𝖾𝗋𝗒: ${searchTerm} 𝗂𝗇 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁 .\n\n${itemInfo}`);
+        } else {
+          message.reply(`📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━━\n𝖳𝗁𝖾 𝗌𝖾𝖺𝗋𝖼𝗁 𝗍𝖾𝗋𝗆 𝗒𝗈𝗎 𝗉𝗋𝗈𝗏𝗂𝖽𝖾𝖽 𝖽𝗈𝖾𝗌 𝗇𝗈𝗍 𝗆𝖺𝗍𝖼𝗁 𝖺𝗇𝗒 𝖺𝗏𝖺𝗂𝗅𝖺𝖻𝗅𝖾 𝗂𝗍𝖾𝗆𝗌 𝗂𝗇 𝗈𝗎𝗋 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁 𝗐𝖾𝖻𝗌𝗂𝗍𝖾.\n\n- 𝖳𝖾𝖺𝗆 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n𝖳𝗁𝖺𝗇𝗄 𝗒𝗈𝗎 𝖿𝗈𝗋 𝗎𝗌𝗂𝗇𝗀 𝗈𝗎𝗋 𝖦𝗈𝖺𝗍𝖬𝖺𝗋𝗍 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 🥰.`);
         }
+      } else if (args[0] === "show") {
+        const itemID = isNaN(args[1]) ? args[1] : parseInt(args[1]);
+        const response = await axios.get(`${serverURL}/api/items/${itemID}?apikey=${APIKEY}`);
+        const item = response.data;
 
-        case "page": {
-          const g = parseInt(args[1]) || 1;
-          if (g <= 0) return a("\n⚠️ Page number must be greater than 0.");
-
-          try {
-            const h = await axios.get(`${GoatMart}/api/items?page=${g}&limit=20`);
-            const { items, total, totalPages } = h.data;
-
-            if (g > totalPages && totalPages > 0) return a(`\n⚠️ Page ${g} doesn't exist. Total: ${totalPages}`);
-            if (!items.length) return a("\n📭 No commands found.");
-
-            const i = items.map((x, y) =>
-              `${(g - 1) * 20 + y + 1}. 📦 ${x.itemName} (ID: ${x.itemID})\n 👀 ${x.views} | 💝 ${x.likes} | 👨‍💻 ${x.authorName}`
-            ).join("\n\n");
-
-            return a(`\n📄 Page ${g}/${totalPages} (${total} total)\n\n${i}\n\n💡 Use "${event.body} show <ID>"`);
-          } catch (err) {
-            return b(err, "browse commands");
-          }
+        if (item && itemID) {
+          message.reply(`📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━━\n\n👑 𝗜𝘁𝗲𝗺 𝗡𝗮𝗺𝗲: ${item.itemName}\n🆔 𝗜𝘁𝗲𝗺 𝗜𝗗: ${item.itemID}\n📝 𝗗𝗲𝘀𝗰𝗿𝗶𝗽𝘁𝗶𝗼𝗻: ${item.description}\n📁 𝗜𝘁𝗲𝗺 𝗟𝗶𝗻𝗸: ${item.pastebinLink}\n\n- 𝖳𝖾𝖺𝗆 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n𝖳𝗁𝖺𝗇𝗄 𝗒𝗈𝗎 𝖿𝗈𝗋 𝗎𝗌𝗂𝗇𝗀 𝗈𝗎𝗋 𝖦𝗈𝖺𝗍𝖬𝖺𝗋𝗍 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 🥰.`);
+        } else if (response.status === 404) {
+          api.sendMessage("📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━━\n𝖳𝗁𝖾 𝗌𝖾𝖺𝗋𝖼𝗁 𝗍𝖾𝗋𝗆 𝗒𝗈𝗎 𝗉𝗋𝗈𝗏𝗂𝖽𝖾𝖽 𝖽𝗈𝖾𝗌 𝗇𝗈𝗍 𝗆𝖺𝗍𝖼𝗁 𝖺𝗇𝗒 𝖺𝗏𝖺𝗂𝗅𝖺𝖻𝗅𝖾 𝗂𝗍𝖾𝗆𝗌 𝗂𝗇 𝗈𝗎𝗋 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁 𝗐𝖾𝖻𝗌𝗂𝗍𝖾.\n\n- 𝖳𝖾𝖺𝗆 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n𝖳𝗁𝖺𝗇𝗄 𝗒𝗈𝗎 𝖿𝗈𝗋 𝗎𝗌𝗂𝗇𝗀 𝗈𝗎𝗋 𝖦𝗈𝖺𝗍𝖬𝖺𝗋𝗍 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 🥰.", event.threadID, event.messageID);
+        } else if (response.status === 401) {
+          api.sendMessage("📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━\n\n𝖳𝗁𝖾 𝗔𝗣𝗜 𝗞𝗘𝗬 𝗒𝗈𝗎 𝖺𝗋𝖾 𝗍𝗋𝗒𝗂𝗇𝗀 𝗍𝗈 𝖺𝖼𝖼𝖾𝗌𝗌 𝗈𝗎𝗋 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 𝗂𝗌 𝗇𝗈𝗍 𝖺𝖼𝗍𝗂𝗏𝖺𝗍𝖾𝖽 𝗂𝗋 𝗂𝗇𝗏𝖺𝗅𝗂𝖽 𝖺𝗉𝗂𝗄𝖾𝗒, 𝗉𝗅𝖾𝖺𝗌𝖾 𝖼𝗁𝖾𝖼𝗄 𝗒𝗈𝗎𝗋 𝗔𝗣𝗜 𝗞𝗘𝗬 𝗂𝗌 𝗐𝗈𝗋𝗄𝗂𝗇𝗀, 𝗂𝖿 𝗍𝗁𝗂𝗌 𝖺𝗉𝗂𝗄𝖾𝗒 𝗂𝗌 𝗇𝗈𝗍 𝗏𝖺𝗅𝗂𝖽 𝗒𝗈𝗎 𝖼𝖺𝗇 𝗃𝗈𝗂𝗇 𝗈𝗎𝗋 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁 𝖢𝗈𝗆𝗆𝗎𝗇𝗂𝗍𝗒 𝖿𝗈𝗋 𝗇𝖾𝗐 𝖺𝗉𝗂𝗄𝖾𝗒, 𝖻𝖾𝖼𝖺𝗎𝗌𝖾 𝗐𝗂𝗍𝗁𝗈𝗎𝗋 𝖺𝗎𝗍𝗁𝗈𝗋𝗂𝗌𝖾𝖽 𝗒𝗈𝗎 𝖼𝖺𝗇'𝗍 𝖺𝖼𝖼𝖾𝗌 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁 𝖲𝖾𝗋𝗏𝗂𝖼𝖾𝗌. 𝖳𝗁𝖺𝗇𝗄 𝖸𝗈𝗎\n\n- 𝖳𝖾𝖺𝗆 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n𝖳𝗁𝖺𝗇𝗄 𝗒𝗈𝗎 𝖿𝗈𝗋 𝗎𝗌𝗂𝗇𝗀 𝗈𝗎𝗋 𝖦𝗈𝖺𝗍𝖬𝖺𝗋𝗍 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 🥰.", event.threadID, event.messageID);
         }
+      } else if (args[0] === "edit") {
+				try {
+					const itemID = isNaN(args[1]) ? args[1] : parseInt(args[1]);
+					const newItemDetails = JSON.parse(args.slice(2).join(" "));
 
-        case "search": {
-          const j = args.slice(1).join(" ");
-          if (!j) return a("\n⚠️ Please provide a search query.");
+					const response = await axios.put(`${serverURL}/api/items/${itemID}?apikey=${APIKEY}`, newItemDetails);
 
-          try {
-            const k = await axios.get(`${GoatMart}/api/items?search=${encodeURIComponent(j)}&limit=8`);
-            const results = k.data.items;
-            if (!results.length) return a(`\n❌ No commands found for "${j}"`);
+					message.reply(`📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━━\n\n✅ 𝖨𝗍𝖾𝗆 𝖾𝖽𝗂𝗍𝖾𝖽 𝗌𝗎𝖼𝖼𝖾𝗌𝗌𝖿𝗎𝗅𝗅𝗒\n👑 𝗜𝘁𝗲𝗺 𝗡𝗮𝗺𝗲: ${response.data.itemName}\n🆔 𝗜𝘁𝗲𝗺 𝗜𝗗: ${response.data.itemID}`);
+				} catch (err) {
+					console.error(err);
+					api.sendMessage("📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━━\n\n𝖸𝗈𝗎 𝖺𝗋𝖾 𝖻𝖺𝗇𝗇𝖾𝖽 𝖿𝗋𝗈𝗆 𝗎𝗌𝗂𝗇𝗀 𝗍𝗁𝗂𝗌 𝖼𝗈𝗆𝗆𝖺𝗇𝖽.\n\n- 𝖳𝖾𝖺𝗆 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n𝖳𝗁𝖺𝗇𝗄 𝗒𝗈𝗎 𝖿𝗈𝗋 𝗎𝗌𝗂𝗇𝗀 𝗈𝗎𝗋 𝖦𝗈𝖺𝗍𝖬𝖺𝗋𝗍 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 🥰.", event.threadID, event.messageID);
+				}
+			} else if (args[0] === "delete") {
+				try {
+					const itemID = isNaN(args[1]) ? args[1] : parseInt(args[1]);
 
-            const l = results.map((x, y) =>
-              `${y + 1}. 📦 ${x.itemName} (ID: ${x.itemID})\n 👀 ${x.views} | 💝 ${x.likes} | 👨‍💻 ${x.authorName}`
-            ).join("\n\n");
+					const response = await axios.delete(`${serverURL}/api/items/${itemID}?apikey=${APIKEY}`);
 
-            return a(`\n🔍 Search: "${j}" (${k.data.total} results)\n\n${l}` +
-              (k.data.total > 8 ? `\n\n📄 Showing top 8 results` : ""));
-          } catch (err) {
-            return b(err, "search commands");
-          }
-        }
+					if (response.status === 204) {
+						message.reply(`📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━━\n\n✅ 𝖨𝗍𝖾𝗆 𝖽𝖾𝗅𝖾𝗍𝖾𝖽 𝗌𝗎𝖼𝖼𝖾𝗌𝗌𝖿𝗎𝗅𝗅𝗒 𝖿𝗋𝗈𝗆 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n🆔 𝗜𝘁𝗲𝗺 𝗜𝗗: ${itemID}`);
+					} else {
+						message.reply(`📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━━\n\n𝖸𝗈𝗎 𝖺𝗋𝖾 𝖻𝖺𝗇𝗇𝖾𝖽 𝖿𝗋𝗈𝗆 𝗎𝗌𝗂𝗇𝗀 𝗍𝗁𝗂𝗌 𝖼𝗈𝗆𝗆𝖺𝗇𝖽.\n\n- 𝖳𝖾𝖺𝗆 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n𝖳𝗁𝖺𝗇𝗄 𝗒𝗈𝗎 𝖿𝗈𝗋 𝗎𝗌𝗂𝗇𝗀 𝗈𝗎𝗋 𝖦𝗈𝖺𝗍𝖬𝖺𝗋𝗍 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 🥰.`);
+					}
+				} catch (err) {
+					console.error(err);
+					api.sendMessage("📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━━\n\n𝖸𝗈𝗎 𝖺𝗋𝖾 𝖻𝖺𝗇𝗇𝖾𝖽 𝖿𝗋𝗈𝗆 𝗎𝗌𝗂𝗇𝗀 𝗍𝗁𝗂𝗌 𝖼𝗈𝗆𝗆𝖺𝗇𝖽.\n\n- 𝖳𝖾𝖺𝗆 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n𝖳𝗁𝖺𝗇𝗄 𝗒𝗈𝗎 𝖿𝗈𝗋 𝗎𝗌𝗂𝗇𝗀 𝗈𝗎𝗋 𝖦𝗈𝖺𝗍𝖬𝖺𝗋𝗍 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 🥰.", event.threadID, event.messageID);
+				}
+			} else if (args[0] === "upload") {
+				try {
+					const itemDetails = JSON.parse(args.slice(1).join(" "));
+					const response = await axios.post(`${serverURL}/api/items?apikey=${APIKEY}`, itemDetails);
 
-        case "trending": {
-          try {
-            const m = await axios.get(`${GoatMart}/api/trending`);
-            const trending = m.data;
-            if (!trending.length) return a("\n📭 No trending commands found.");
-
-            const trendingList = trending.map((x, y) =>
-              `${y + 1}. 📦 ${x.itemName} (ID: ${x.itemID || 'N/A'})\n 👀 ${x.views} | 💝 ${x.likes} | 👨‍💻 ${x.authorName}`
-            ).join("\n\n");
-
-            return a(`\n🔥 Trending Commands:\n\n${trendingList}`);
-          } catch (err) {
-            return b(err, "fetch trending");
-          }
-        }
-
-        case "raw": {
-          const id = args[1];
-          if (!id) return a("\n⚠️ Please provide a command ID or short ID.");
-          try {
-            let rawUrl;
-            if (/^\d+$/.test(id)) {
-              rawUrl = `${GoatMart}/raw/seq/${id}`;
-            } else {
-              rawUrl = `${GoatMart}/raw/${id}`;
-            }
-            
-            const response = await axios.get(rawUrl);
-            const codeLines = response.data.split('\n').length;
-            return a(`\n📄 Raw code retrieved!\n🔗 URL: ${rawUrl}\n📊 Lines: ${codeLines}\n\n💡 Copy the URL to download the code`);
-          } catch (err) {
-            if (err.response?.status === 404) return a("\n❌ Command not found.");
-            return b(err, "fetch raw code");
-          }
-        }
-
-        case "maintenance": {
-          try {
-            const status = await axios.get(`${GoatMart}/api/maintenance`);
-            const maintenance = status.data;
-            if (maintenance.enabled) {
-              return a(`\n🚧 Maintenance Mode: ACTIVE\n📝 Title: ${maintenance.title}\n💬 Message: ${maintenance.message}\n${maintenance.estimatedTime ? `⏰ Estimated: ${maintenance.estimatedTime}` : ''}`);
-            } else {
-              return a(`\n✅ Maintenance Mode: DISABLED\n🎉 All services operational!`);
-            }
-          } catch (err) {
-            return b(err, "check maintenance status");
-          }
-        }
-
-        case "stats": {
-          try {
-            const m = await axios.get(`${GoatMart}/api/stats`);
-            const n = m.data;
-            return a(`\n📊 Platform Stats\n\n📦 Commands: ${n.totalCommands || 0}\n💝 Total Likes: ${n.totalLikes || 0}\n👥 Daily Users: ${n.dailyActiveUsers || 0}\n📈 Total Views: ${n.totalViews || 0}\n📤 Total Uploads: ${n.totalUploads || 0}\n🔗 Total Requests: ${n.totalRequests || 0}\n⏰ Uptime: ${n.hosting?.uptime ? `${n.hosting.uptime.days}d ${n.hosting.uptime.hours}h` : "N/A"}\n💾 Memory: ${n.hosting?.memory ? `${Math.round(n.hosting.memory.heapUsed)}MB used` : "N/A"}\n🌟 Top Author: ${n.topAuthors?.[0]?._id || "N/A"}\n🔥 Most Viewed: ${n.topViewed?.[0]?.itemName || "N/A"}`);
-          } catch (err) {
-            return b(err, "fetch statistics");
-          }
-        }
-
-        case "like": {
-          const itemId = parseInt(args[1]);
-          if (isNaN(itemId)) return a("\n⚠️ Please provide a valid item ID to like.");
-          try {
-            const response = await axios.post(`${GoatMart}/api/items/${itemId}/like`);
-            return a(`\n💝 Command liked successfully!\n👍 Total likes: ${response.data.likes}`);
-          } catch (err) {
-            if (err.response?.status === 404) return a("\n❌ Command not found.");
-            return b(err, "like command");
-          }
-        }
-
-        case "upload": {
-          const o = event.senderID;
-          const p = global.GoatBot?.config?.adminBot || [];
-          if (!p.includes(o)) return a("🚫 Only bot administrators can upload commands.");
-
-          const q = args[1];
-          if (!q) return a("⚠️ Provide a command filename to upload.");
-          const r = path.join(__dirname, q.endsWith(".js") ? q : `${q}.js`);
-          if (!fs.existsSync(r)) return a(`❌ File not found: ${r}`);
-
-          try {
-            const s = fs.readFileSync(r, "utf-8");
-            let t;
-            try {
-              t = require(r);
-            } catch {
-              return a("❌ Unable to parse command file.");
-            }
-
-            const u = {
-              itemName: t.config?.name || q,
-              description: t.config?.longDescription?.en || t.config?.shortDescription?.en || "Bot command from GoatBot.",
-              type: "GoatBot",
-              code: s,
-              authorName: t.config?.author || "Anonymous",
-              tags: ["goatbot", "command"],
-              difficulty: "Intermediate",
-            };
-
-            const v = await axios.post(`${GoatMart}/api/items`, u, { headers: { "Content-Type": "application/json" } });
-            const { success, shortId, itemId, message: responseMessage } = v.data;
-            if (!success) return a("❌ Upload failed. Try again later.");
-
-            return a(`✅ Upload Success!\n\n📦 Name: ${u.itemName}\n🧑 Author: ${u.authorName}\n📄 Lines: ${s.split("\n").length}\n\n🆔 ID: ${itemId}\n🔐 Short ID: ${shortId}\n\n🔗 Raw: ${GoatMart}/raw/${shortId}\n🌐 View: ${GoatMart}/view?id=${itemId}`);
-          } catch (err) {
-            console.error("Upload error:", err);
-            return a("❌ Upload failed due to server error.");
-          }
-        }
-
-        default:
-          return a(`\n⚠️ Unknown command: "${c}"\n\n💡 Use "${event.body}" to see all available options.`);
-      }
-    } catch (err) {
-      console.error("GoatMart Error:", err);
-      return a("\n❌ An unexpected error occurred. Please try again later.");
+					if (response.status === 201) {
+						const uploadedItem = response.data;
+						message.reply(`📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━\n\n𝖸𝗈𝗎𝗋 𝗗𝗮𝘁𝗮 𝗌𝗎𝖼𝖼𝖾𝗌𝗌𝖿𝗎𝗅𝗅𝗒 𝗎𝗉𝗅𝗈𝖺𝖽𝖾𝖽 𝗂𝗇 𝗈𝗎𝗋 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁 𝗌𝖾𝗋𝗏𝗂𝖼𝖾.\n\n👑 𝗜𝘁𝗲𝗺 𝗡𝗮𝗺𝗲: ${uploadedItem.itemName}\n🆔 𝗜𝘁𝗲𝗺 𝗜𝗗: ${uploadedItem.itemID}\n⚙ 𝗜𝘁𝗲𝗺 𝗧𝘆𝗽𝗲: ${uploadedItem.type || "Unknown"}\n📝 𝗗𝗲𝘀𝗰𝗿𝗶𝗽𝘁𝗶𝗼𝗻: ${uploadedItem.description}\n📁 𝗜𝘁𝗲𝗺 𝗟𝗶𝗻𝗸: ${uploadedItem.pastebinLink}\n\n- 𝖳𝖾𝖺𝗆 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n𝖳𝗁𝖺𝗇𝗄 𝗒𝗈𝗎 𝖿𝗈𝗋 𝗎𝗌𝗂𝗇𝗀 𝗈𝗎𝗋 𝖦𝗈𝖺𝗍𝖬𝖺𝗋𝗍 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 🥰.`);
+					} else if (response.status === 401) {
+						api.sendMessage("📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━\n\n𝖳𝗁𝖾 𝗔𝗣𝗜 𝗞𝗘𝗬 𝗒𝗈𝗎 𝖺𝗋𝖾 𝗍𝗋𝗒𝗂𝗇𝗀 𝗍𝗈 𝖺𝖼𝖼𝖾𝗌𝗌 𝗈𝗎𝗋 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 𝗂𝗌 𝗇𝗈𝗍 𝖺𝖼𝗍𝗂𝗏𝖺𝗍𝖾𝖽 𝗂𝗋 𝗂𝗇𝗏𝖺𝗅𝗂𝖽 𝖺𝗉𝗂𝗄𝖾𝗒, 𝗉𝗅𝖾𝖺𝗌𝖾 𝖼𝗁𝖾𝖼𝗄 𝗒𝗈𝗎𝗋 𝗔𝗣𝗜 𝗞𝗘𝗬 𝗂𝗌 𝗐𝗈𝗋𝗄𝗂𝗇𝗀, 𝗂𝖿 𝗍𝗁𝗂𝗌 𝖺𝗉𝗂𝗄𝖾𝗒 𝗂𝗌 𝗇𝗈𝗍 𝗏𝖺𝗅𝗂𝖽 𝗒𝗈𝗎 𝖼𝖺𝗇 𝗃𝗈𝗂𝗇 𝗈𝗎𝗋 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁 𝖢𝗈𝗆𝗆𝗎𝗇𝗂𝗍𝗒 𝖿𝗈𝗋 𝗇𝖾𝗐 𝖺𝗉𝗂𝗄𝖾𝗒, 𝖻𝖾𝖼𝖺𝗎𝗌𝖾 𝗐𝗂𝗍𝗁𝗈𝗎𝗋 𝖺𝗎𝗍𝗁𝗈𝗋𝗂𝗌𝖾𝖽 𝗒𝗈𝗎 𝖼𝖺𝗇'𝗍 𝖺𝖼𝖼𝖾𝗌 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁 𝖲𝖾𝗋𝗏𝗂𝖼𝖾𝗌. 𝖳𝗁𝖺𝗇𝗄 𝖸𝗈𝗎\n\n- 𝖳𝖾𝖺𝗆 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n𝖳𝗁𝖺𝗇𝗄 𝗒𝗈𝗎 𝖿𝗈𝗋 𝗎𝗌𝗂𝗇𝗀 𝗈𝗎𝗋 𝖦𝗈𝖺𝗍𝖬𝖺𝗋𝗍 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 🥰.", event.threadID, event.messageID);
+					}
+				} catch (err) {
+					console.error(err);
+					api.sendMessage("📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━━\n\n𝖸𝗈𝗎 𝖺𝗋𝖾 𝖻𝖺𝗇𝗇𝖾𝖽 𝖿𝗋𝗈𝗆 𝗎𝗌𝗂𝗇𝗀 𝗍𝗁𝗂𝗌 𝖼𝗈𝗆𝗆𝖺𝗇𝖽.\n\n- 𝖳𝖾𝖺𝗆 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n𝖳𝗁𝖺𝗇𝗄 𝗒𝗈𝗎 𝖿𝗈𝗋 𝗎𝗌𝗂𝗇𝗀 𝗈𝗎𝗋 𝖦𝗈𝖺𝗍𝖬𝖺𝗋𝗍 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 🥰.", event.threadID, event.messageID);
+				}
+			}
+		} catch (err) {
+      console.error(err);
+      api.sendMessage("📚 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n━━━━━━━━━━━━\n\n𝖸𝗈𝗎 𝖺𝗋𝖾 𝖻𝖺𝗇𝗇𝖾𝖽 𝖿𝗋𝗈𝗆 𝗎𝗌𝗂𝗇𝗀 𝗍𝗁𝗂𝗌 𝖼𝗈𝗆𝗆𝖺𝗇𝖽.\n\n- 𝖳𝖾𝖺𝗆 𝗚𝗼𝗮𝘁𝗠𝗮𝗿𝘁\n𝖳𝗁𝖺𝗇𝗄 𝗒𝗈𝗎 𝖿𝗈𝗋 𝗎𝗌𝗂𝗇𝗀 𝗈𝗎𝗋 𝖦𝗈𝖺𝗍𝖬𝖺𝗋𝗍 𝗌𝖾𝗋𝗏𝗂𝖼𝖾𝗌 🥰.", event.threadID, event.messageID);
     }
-  }
+  },
 };
