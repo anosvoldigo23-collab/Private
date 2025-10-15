@@ -156,7 +156,7 @@ module.exports = {
   config: {
     name: "rank",
     version: "5.3",
-    author: "Ew'r Saim |with help from fahad",
+    author: "Christus |with help from Aesther",
     countDown: 5,
     role: 0,
     shortDescription: "Show stylish neon rank card",
